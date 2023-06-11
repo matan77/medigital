@@ -2,70 +2,176 @@
 
     <body>
 
-
-        <h3>Edit category</h3>
-
-        <form id="update_form" method="post" action="/functions/edit_category/<%= category.id %>">
-
-            <div class="container">
+        <%- include('./components/navigation')%>
+            <div class="container" style="margin-top: 30px;">
                 <div class="row">
-                    <div class="col-lg-2">
-                        <img src="<%= category.categoryImage%>" style="width:100px" />
-                    </div>
-                    <div class="col-lg-4">
-                        <label class="form-label">Category name</label>
-                        <input type="text" name="categoryName" value="<%= category.categoryName %>"
-                            class="form-control">
-                    </div>
-                    <div class="col-lg-4">
-                        <label class="form-label">Category image</label>
-                        <input type="text" name="categoryMainImage" value="<%= category.categoryImage %>"
-                            class="form-control">
-                    </div>
-                    <div class="col-lg-2">
-                        <button style="margin-top: 30px;" form="update_form" type="submit"
-                            class="btn btn-primary">Update</button>
-                    </div>
 
-                </div>
-            </div>
+                    <form id="edit_category_form" method="post" action="/functions/edit_category/<%= category.id %>">
+                        <div class="container">
+                            <div class="row">
+                                <h3>Edit category</h3>
+                                <div class="col-lg-2">
+                                    <img id="categoryImage" src="<%= category.categoryImage%>" style="width:100px"
+                                        alt="Category Image" />
+                                </div>
+                                <div class="col-lg-4">
+                                    <label class="form-label">Category name</label>
+                                    <input type="text" name="categoryName" value="<%= category.categoryName %>"
+                                        class="form-control">
+                                </div>
+                                <div class="col-lg-4">
+                                    <label class="form-label">Category image</label>
+                                    <input id="inputCategoryImage" type="text" name="categoryImage"
+                                        value="<%= category.categoryImage %>" class="form-control">
+                                </div>
+                                <div class="col-lg-2">
+                                    <button style="margin-top: 30px;" form="edit_category_form" type="submit"
+                                        class="btn btn-primary">Update</button>
+                                </div>
 
-        </form>
-
-        <div class="container" style="margin-top: 30px;">
-
-
-            <div class="row">
-                <div class="col-lg-3">
-
-
-                    <form>
-
-                        <select class="form-select" name="" aria-label="Default select example">
-                            <%for(let item of categories){%>
-                                <option value="<%= item.id%>">
-                                    <%= item.categoryName %>
-                                </option>
-                                <%}%>
-                        </select>
+                            </div>
+                            <script>
+                                const input = document.getElementById("inputCategoryImage");
+                                const image = document.getElementById("categoryImage");
+                                input.addEventListener("input", (e) => {
+                                    if (!e.target.value.startsWith("http") && !e.target.value.startsWith("/")) {
+                                        e.target.value = '/' + e.target.value
+                                    }
+                                    image.src = e.target.value
+                                });
+                            </script>
+                        </div>
 
                     </form>
+                </div>
 
+            </div>
+
+            <div class="container" style="margin-top: 30px;">
+                <div class="row">
+
+                    <div class="col-lg-3">
+                        <h3>Add product</h3>
+
+                        <form id="add_product_form" method="post" action="/functions/add_product/<%=category.id%>">
+
+                            <label class="form-label">Product Name</label>
+                            <input type="text" class="form-control" name="productName">
+
+                            <label class="form-label">Product Image</label>
+                            <input type="text" class="form-control" name="productMainImage">
+
+                            <label class="form-label">Product Description</label>
+                            <textarea class="form-control" name="productDescription" rows="3"></textarea>
+
+                            <label class="form-label">Product price</label>
+                            <input type="number" class="form-control" value="0" name="productPrice">
+
+                            <label class="form-label">Units In Stock</label>
+                            <input type="number" class="form-control" value="0" name="unitInStock">
+
+                            <label class="form-label">Is Available</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" checked value="true" name="isAvailable"
+                                    id="isAvailableCheckbox">
+                                <input id="hiddenIsAvailableCheckbox" type="hidden">
+                            </div>
+
+
+                            <button form="add_product_form" type="submit" class="btn btn-primary"
+                                style="width: 100%; margin-top: 12px;">Create New
+                                Product</button>
+
+                            <script>
+                                const checkbox = document.getElementById("isAvailableCheckbox");
+                                checkbox.addEventListener("change", (e) => {
+                                    const hiddenInput = document.getElementById("hiddenIsAvailableCheckbox");
+                                    if (e.target.checked) {
+                                        hiddenInput.removeAttribute('name');
+                                        hiddenInput.removeAttribute('value');
+                                    } else {
+                                        hiddenInput.name = "isAvailable";
+                                        hiddenInput.value = "false";
+                                    }
+                                });
+                            </script>
+                        </form>
+
+                    </div>
+                    <div class="col-lg-9">
+                        <%if(products.length> 0){%>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Product ID</th>
+                                        <th>Image</th>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>Description</th>
+                                        <th>Units In Stock</th>
+                                        <th>Is Available</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <%for(let product of products){%>
+                                        <tr>
+                                            <td>
+                                                <%= product.id%>
+                                            </td>
+                                            <td><img src="<%= product.productMainImage%>" style="width:100px" /></td>
+                                            <td>
+                                                <%= product.productName%>
+                                            </td>
+                                            <td>
+                                                <%= product.productPrice%>
+                                            </td>
+                                            <td>
+                                                <%= product.productDescription%>
+                                            </td>
+                                            <td>
+                                                <%= product.unitInStock%>
+                                            </td>
+                                            <td>
+                                                <% if (product.isAvailable) { %>
+                                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                                    <% } else { %>
+                                                        <i class="bi bi-x-circle-fill text-danger"></i>
+                                                        <% } %>
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-info" style="margin-top: 5px;"
+                                                    href="/product/<%= product.id%>">
+                                                    Edit
+                                                </a>
+                                                <form style="display: inline;" id="delete_product<%= product.id %>"
+                                                    method="post" action="/functions/delete_product/<%= product.id %>">
+                                                    <button style="margin-top: 5px;"
+                                                        form="delete_product<%= product.id %>" type="submit"
+                                                        class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        <%}%>
+
+                                </tbody>
+                            </table>
+                            <%} else {%>
+                                <p>No data for you</p>
+                                <%}%>
+
+                    </div>
 
                 </div>
 
             </div>
 
-        </div>
 
 
-        </div>
-
-
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-            crossorigin="anonymous"></script>
+            <%- include('./components/footer')%>
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+                    integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+                    crossorigin="anonymous"></script>
     </body>
 
     </html>
